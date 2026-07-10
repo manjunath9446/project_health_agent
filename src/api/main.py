@@ -97,3 +97,7 @@ app.include_router(
     prefix="/api/v1",
     tags=["Project Upload"],
 )
+@app.on_event("startup")
+async def startup():
+
+    await init_db()
