@@ -3,6 +3,8 @@ from __future__ import annotations
 import streamlit as st
 import sys
 from pathlib import Path
+st.write("GROQ Exists:", "GROQ_API_KEY" in os.environ)
+st.write("Value:", os.getenv("GROQ_API_KEY"))
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
