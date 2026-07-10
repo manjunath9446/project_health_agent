@@ -176,7 +176,7 @@ class ProjectAnalysisService:
 
             rag_status=rag,
 
-            health_score=float(score),
+            health_score=float(health_score),
 
             forecast_delay=int(forecast_delay),
 
