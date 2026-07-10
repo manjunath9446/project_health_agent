@@ -45,7 +45,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://projecthealthagent.streamlit.app/"],      # Replace with your frontend URL later
+    allow_origins=["https://project-health-agent-1.onrender.com"],      # Replace with your frontend URL later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
