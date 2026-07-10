@@ -56,6 +56,9 @@ async def analyze_project(
     project_name: str,
     file_path: str,
 ):
+from src.core.database import init_db
+
+await init_db()
 
     async with async_session() as session:
 

@@ -60,5 +60,12 @@ async def init_db():
     async with engine.begin() as conn:
 
         await conn.run_sync(Base.metadata.create_all)
+    from sqlalchemy import text
+
+    result = await conn.execute(
+        text("SELECT name FROM sqlite_master WHERE type='table';")
+    )
+
+    print("Tables:", result.fetchall())
 
     print("✅ Database initialized.")

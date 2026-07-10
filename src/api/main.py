@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routes.project_upload import router as upload_router
+from src.core.database import init_db
 from src.core.logging_config import configure_logging, set_correlation_id
 
 # ----------------------------------------------------
@@ -14,82 +15,83 @@ configure_logging()
 
 
 # ----------------------------------------------------
-# Application Lifespan
+# Lifespan
 # ----------------------------------------------------
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    print("🚀 AI Project Health Backend Started")
+    print("🚀 Starting Backend...")
+
+    await init_db()
+
+    print("✅ Database initialized.")
 
     yield
 
-    print("🛑 AI Project Health Backend Stopped")
+    print("🛑 Backend Stopped")
 
 
 # ----------------------------------------------------
-# FastAPI App
+# App
 # ----------------------------------------------------
 
 app = FastAPI(
     title="AI Project Health Intelligence API",
-    description="AI-powered Project Health Assessment using Multi-Agent Intelligence",
+    description="AI-powered Project Health Assessment",
     version="1.0.0",
     lifespan=lifespan,
 )
 
 
 # ----------------------------------------------------
-# Middleware
+# CORS
 # ----------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://project-health-agent-1.onrender.com"],      # Replace with your frontend URL later
+    allow_origins=[
+        "https://project-health-agent-1.onrender.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+# ----------------------------------------------------
+# Correlation ID
+# ----------------------------------------------------
+
 @app.middleware("http")
 async def correlation_id_middleware(
     request: Request,
     call_next,
 ):
-
     set_correlation_id()
-
-    response = await call_next(request)
-
-    return response
+    return await call_next(request)
 
 
 # ----------------------------------------------------
-# Health Endpoints
+# Health
 # ----------------------------------------------------
 
-@app.get("/", tags=["Health"])
+@app.get("/")
 async def root():
-
     return {
-        "message": "AI Project Health Backend Running",
-        "status": "healthy",
+        "message": "AI Project Health Backend Running"
     }
 
 
-@app.get("/health", tags=["Health"])
+@app.get("/health")
 async def health():
-
     return {
-        "status": "healthy",
-        "service": "AI Project Health Intelligence",
-        "version": "1.0.0",
+        "status": "healthy"
     }
 
 
 # ----------------------------------------------------
-# Routers
+# Routes
 # ----------------------------------------------------
 
 app.include_router(
@@ -97,19 +99,3 @@ app.include_router(
     prefix="/api/v1",
     tags=["Project Upload"],
 )
-@app.on_event("startup")
-async def startup():
-    from src.core.database import init_db
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-
-    await init_db()
-
-    print("Backend Started")
-
-    yield
-
-    print("Backend Stopped")
-
-    
