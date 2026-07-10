@@ -10,4 +10,5 @@ services:
       pip install -r requirements.txt
 
     startCommand: |
-      uvicorn src.main:app --host 0.0.0.0 --port $PORT
+      alembic upgrade head &&
+      uvicorn src.core.main:app --host 0.0.0.0 --port $PORT
