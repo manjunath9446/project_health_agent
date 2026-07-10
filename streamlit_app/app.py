@@ -3,8 +3,7 @@ import os
 import streamlit as st
 import sys
 from pathlib import Path
-st.write("GROQ Exists:", "GROQ_API_KEY" in os.environ)
-st.write("Value:", os.getenv("GROQ_API_KEY"))
+await init_db()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
