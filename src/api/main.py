@@ -99,5 +99,17 @@ app.include_router(
 )
 @app.on_event("startup")
 async def startup():
+    from src.core.database import init_db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
 
     await init_db()
+
+    print("Backend Started")
+
+    yield
+
+    print("Backend Stopped")
+
+    

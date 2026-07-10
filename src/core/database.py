@@ -7,18 +7,15 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import DeclarativeBase
 
 from src.core.config import settings
-from src.core.database import engine, Base
 
-async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
 
+# ----------------------------------------------------
+# Database Engine
+# ----------------------------------------------------
 
 engine = create_async_engine(
     settings.database_url,
     echo=False,
-    pool_size=20,
-    max_overflow=0,
 )
 
 async_session = async_sessionmaker(
@@ -28,40 +25,40 @@ async_session = async_sessionmaker(
 )
 
 
+# ----------------------------------------------------
+# Base Class
+# ----------------------------------------------------
+
 class Base(DeclarativeBase):
     pass
 
 
+# ----------------------------------------------------
+# Dependency
+# ----------------------------------------------------
+
 async def get_db():
+
     async with async_session() as session:
         yield session
 
 
-# =====================================================
-# Create Database Tables
-# =====================================================
+# ----------------------------------------------------
+# Initialize Database
+# ----------------------------------------------------
 
 async def init_db():
 
-    # Import ALL models before create_all()
+    # IMPORTANT:
+    # Import every model so SQLAlchemy registers them.
 
-    from src.models.project import (
-        Project,
-        Phase,
-        Milestone,
-        Task,
-    )
-
-    from src.models.summary import Summary
-
-    from src.models.comment import Comment
-
-    from src.models.project_analysis import ProjectAnalysis
+    import src.models.project
+    import src.models.summary
+    import src.models.comment
+    import src.models.project_analysis
 
     async with engine.begin() as conn:
 
-        await conn.run_sync(
-            Base.metadata.create_all
-        )
+        await conn.run_sync(Base.metadata.create_all)
 
-    print("Database initialized successfully.")
+    print("✅ Database initialized.")
