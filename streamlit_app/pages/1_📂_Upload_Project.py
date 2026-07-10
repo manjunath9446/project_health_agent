@@ -88,3 +88,88 @@ async def analyze_project(
 # ==========================================================
 # BUTTON
 # ==========================================================
+
+if st.button(
+    "🚀 Analyze Project",
+    use_container_width=True,
+    type="primary",
+):
+
+    if not project_name.strip():
+        st.error("Please enter a project name.")
+        st.stop()
+
+    if uploaded_file is None:
+        st.error("Please upload a Microsoft Project workbook.")
+        st.stop()
+
+    with tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".xlsx",
+    ) as temp:
+
+        temp.write(uploaded_file.read())
+        excel_path = temp.name
+
+    progress = st.progress(0)
+    status = st.empty()
+
+    try:
+
+        status.info("Uploading workbook...")
+        progress.progress(20)
+
+        status.info("Reading project plan...")
+        progress.progress(40)
+
+        status.info("Running AI analysis...")
+        progress.progress(60)
+
+        pipeline, dashboard = asyncio.run(
+            analyze_project(
+                project_name,
+                excel_path,
+            )
+        )
+
+        progress.progress(100)
+
+        st.session_state.project_loaded = True
+        st.session_state.project_name = project_name
+        st.session_state.pipeline = pipeline
+        st.session_state.dashboard = dashboard
+
+        status.success("Analysis Complete")
+        st.success("Project analyzed successfully.")
+
+    except Exception as e:
+        st.exception(e)
+
+    finally:
+        try:
+            Path(excel_path).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+# ==========================================================
+# AFTER ANALYSIS
+# ==========================================================
+
+if st.session_state.project_loaded:
+
+    st.divider()
+
+    st.success("✅ Project successfully loaded.")
+
+    st.write(f"**Project:** {st.session_state.project_name}")
+
+    if st.button(
+        "➡ View RAG Status",
+        use_container_width=True,
+    ):
+        st.switch_page("pages/2_🚦_RAG_Status.py")
+
+else:
+
+    st.info("Upload a project and click **Analyze Project**.")
