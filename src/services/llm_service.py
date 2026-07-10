@@ -17,16 +17,20 @@ class LLMService:
 
     def __init__(self):
 
-        print("=" * 80)
-        print("ENV PATH :", ENV_PATH)
-        print("EXISTS   :", ENV_PATH.exists())
-        print("API KEY  :", os.getenv("GROQ_API_KEY"))
-        print("=" * 80)
+        # Only load .env locally if it exists
+        if ENV_PATH.exists():
+            load_dotenv(dotenv_path=ENV_PATH)
 
-        api_key = os.getenv("GROQ_API_KEY")
+        api_key = os.environ.get("GROQ_API_KEY")
+
+        logger.info("Running Environment : {}", os.getenv("RENDER", "LOCAL"))
+        logger.info("Using .env file     : {}", ENV_PATH.exists())
+        logger.info("API Key Available   : {}", "YES" if api_key else "NO")
 
         if not api_key:
-            raise RuntimeError("GROQ_API_KEY environment variable not found.")
+            raise RuntimeError(
+                "GROQ_API_KEY environment variable not found."
+            )
 
         self.client = AsyncGroq(
             api_key=api_key,
