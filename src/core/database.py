@@ -8,7 +8,6 @@ from sqlalchemy.orm import DeclarativeBase
 
 from src.core.config import settings
 
-
 # ----------------------------------------------------
 # Database Engine
 # ----------------------------------------------------
@@ -24,14 +23,12 @@ async_session = async_sessionmaker(
     expire_on_commit=False,
 )
 
-
 # ----------------------------------------------------
 # Base Class
 # ----------------------------------------------------
 
 class Base(DeclarativeBase):
     pass
-
 
 # ----------------------------------------------------
 # Dependency
@@ -42,15 +39,13 @@ async def get_db():
     async with async_session() as session:
         yield session
 
-
 # ----------------------------------------------------
 # Initialize Database
 # ----------------------------------------------------
 
 async def init_db():
 
-    # IMPORTANT:
-    # Import every model so SQLAlchemy registers them.
+    # Import ALL models so SQLAlchemy registers them
 
     import src.models.project
     import src.models.summary
@@ -59,13 +54,7 @@ async def init_db():
 
     async with engine.begin() as conn:
 
+        # Create all tables
         await conn.run_sync(Base.metadata.create_all)
-    from sqlalchemy import text
 
-    result = await conn.execute(
-        text("SELECT name FROM sqlite_master WHERE type='table';")
-    )
-
-    print("Tables:", result.fetchall())
-
-    print("✅ Database initialized.")
+    print("✅ Database initialized successfully.")
